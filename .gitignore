@@ -1,0 +1,23 @@
+# Model weights and runtime files
+models/
+runtime/
+runtime-new/
+ollama-home/
+config/
+*.gguf
+*.safetensors
+
+# Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Editor and system files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+__pycache__/
+*.pyc
