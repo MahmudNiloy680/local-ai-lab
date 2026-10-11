@@ -1,41 +1,85 @@
+
 #!/usr/bin/env bash
 set -u
+
+BASE="/mnt/Experiment/AI-Lab"
+HOST="127.0.0.1:11434"
+
+section() {
+    printf '\n%s\n' "$1"
+    printf '%s\n' "--------------------------------"
+}
 
 echo "Local AI Lab — Environment Check"
 echo "================================"
 
-if [ -r /etc/os-release ]; then
+section "Operating System"
+if [[ -r /etc/os-release ]]; then
     . /etc/os-release
-    echo "OS: ${PRETTY_NAME:-Linux}"
+    echo "${PRETTY_NAME:-Linux}"
+else
+    echo "Unable to identify operating system"
 fi
 
-echo "Bash: $(bash --version | head -n 1)"
-echo "Git: $(git --version 2>/dev/null || echo 'not installed')"
+section "Basic Tools"
+for tool in bash git curl mountpoint; do
+    if command -v "$tool" >/dev/null 2>&1; then
+        printf '%-12s %s\n' "$tool" "$(command -v "$tool")"
+    else
+        printf '%-12s %s\n' "$tool" "NOT FOUND"
+    fi
+done
 
-echo
-echo "Ollama:"
+section "Experiment Partition"
+if mountpoint -q /mnt/Experiment; then
+    echo "Mounted: yes"
+    df -h /mnt/Experiment
+else
+    echo "Mounted: no"
+    echo "The local AI storage partition is unavailable."
+fi
+
+section "Ollama Runtime"
+for binary in \
+    "$BASE/runtime/bin/ollama" \
+    "$BASE/runtime-new/bin/ollama"
+do
+    if [[ -x "$binary" ]]; then
+        echo "Found: $binary"
+        "$binary" --version 2>&1 | head -n 2
+    else
+        echo "Not executable: $binary"
+    fi
+done
+
 if command -v ollama >/dev/null 2>&1; then
-    command -v ollama
+    echo "PATH command: $(command -v ollama)"
     ollama --version 2>&1 | head -n 2
 else
-    echo "Not found in PATH"
+    echo "Ollama is not available in PATH."
 fi
 
-echo
-echo "NVIDIA GPU:"
+section "Model Storage"
+if [[ -d "$BASE/models" ]]; then
+    du -sh "$BASE/models" 2>/dev/null || true
+else
+    echo "Model directory not found: $BASE/models"
+fi
+
+section "NVIDIA GPU"
 if command -v nvidia-smi >/dev/null 2>&1; then
-    nvidia-smi --query-gpu=name --format=csv,noheader \
-        2>/dev/null || echo "GPU query failed"
+    nvidia-smi --query-gpu=name --format=csv,noheader 2>&1 ||
+        echo "GPU query failed"
 else
     echo "nvidia-smi unavailable"
 fi
 
-echo
-echo "Local Ollama API:"
-if curl -fsS --max-time 2 http://127.0.0.1:11434/api/version\; then
+section "Local Ollama API"
+if command -v curl >/dev/null 2>&1 &&
+    curl -fsS --max-time 2 "http://$HOST/api/version"; then
     echo
 else
-    echo "No responding local server"
+    echo "No responding local server at $HOST"
 fi
 
 echo
