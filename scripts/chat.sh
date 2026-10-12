@@ -13,7 +13,7 @@ fi
 source "$CONFIG"
 
 BASE="${AI_LAB_BASE:?AI_LAB_BASE is not configured}"
-MODEL="${AI_LAB_MODEL:-qwen2.5-coder:7b}"
+MODEL="${1:-${AI_LAB_MODEL:-qwen2.5-coder:7b}}"
 HOST="${AI_LAB_HOST:-127.0.0.1:11434}"
 RUNTIME="${AI_LAB_RUNTIME:-runtime}"
 OLLAMA="$BASE/$RUNTIME/bin/ollama"
