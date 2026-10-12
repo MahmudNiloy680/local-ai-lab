@@ -30,6 +30,7 @@ The current setup includes Ollama, the Qwen 2.5 Coder 7B model, and an NVIDIA RT
 │   ├── scripts/
 │   │   └── chat.sh               # Chat helper script
 │   ├── scripts/check-environment.sh
+│   ├── PROJECT_STATUS.md
 │   ├── README.md
 │   ├── LICENSE
 │   └── .gitignore
@@ -62,9 +63,9 @@ The current setup includes Ollama, the Qwen 2.5 Coder 7B model, and an NVIDIA RT
 - [x] Update `scripts/chat.sh`.
 - [x] Configure the `ai-lab` shell alias to point to `/mnt/Experiment/AI-Lab/bin/ai-lab`.
 - [x] Resolve the previously reported missing-entry-point path issue; the user subsequently confirmed completion.
-- [ ] Verify the complete workflow from a fresh terminal: run `ai-lab` and confirm that the GUI opens.
-- [ ] Verify model discovery, Ollama server start/stop, and terminal chat from the GUI.
-- [ ] Confirm that the configured model responds successfully after launching through the GUI.
+- [x] Verify the complete workflow from a fresh terminal: run `ai-lab` and confirm that the GUI opens.
+- [x] Verify model discovery, Ollama server start/stop, and terminal chat from the GUI.
+- [x] Confirm that the configured model responds successfully after launching through the GUI.
 - [ ] Test error handling when Ollama is unavailable or the configured model is missing.
 
 > Checked items above reflect work reported as completed during development. Items that depend on a fresh end-to-end run remain unchecked until explicitly verified.
@@ -73,19 +74,19 @@ The current setup includes Ollama, the Qwen 2.5 Coder 7B model, and an NVIDIA RT
 
 ### P0 — End-to-end reliability
 
-- [ ] Run `ai-lab` from a fresh terminal and confirm that the GUI starts reliably.
-- [ ] Confirm the GUI and scripts consistently use the intended runtime at `/mnt/Experiment/AI-Lab/runtime/bin/ollama`.
-- [ ] Check whether any legacy `runtime-new` path is still referenced; remove or support it intentionally rather than relying on ambiguous path fallbacks.
-- [ ] Test server start, server stop, model listing/refresh, and chat.
+- [x] Run `ai-lab` from a fresh terminal and confirm that the GUI starts reliably.
+- [x] Confirm the GUI and scripts consistently use the intended runtime at `/mnt/Experiment/AI-Lab/runtime/bin/ollama`.
+- [x] Test server start, server stop, model listing/refresh, and chat.
+- [x] Run `git diff --check` and review `git status` before committing.
 - [ ] Capture and surface actionable errors for missing binaries, unavailable server, missing model, and failed commands.
-- [ ] Run `git diff --check` and review `git status` before committing.
+
 
 ### P1 — Improve the desktop experience
 
-- [ ] Show the active server state clearly (stopped, starting, running, or error).
-- [ ] Show available models and refresh the list on demand.
-- [ ] Display the selected model and useful model metadata where available.
-- [ ] Add a one-click action for the primary Qwen Coder chat workflow.
+- [x] Show the active server state clearly (stopped, starting, running, or error).
+- [x] Show available models and refresh the list on demand.
+- [x] Display the selected model and useful model metadata where available.
+- [x] Add a one-click action for the primary Qwen Coder chat workflow.
 - [ ] Keep long-running operations from freezing the GUI; provide progress or status feedback.
 - [ ] Ensure subprocesses are terminated cleanly and logs/errors are available for troubleshooting.
 
@@ -99,7 +100,7 @@ The current setup includes Ollama, the Qwen 2.5 Coder 7B model, and an NVIDIA RT
 
 ### P3 — Quality and project presentation
 
-- [ ] Document prerequisites, installation, launch, troubleshooting, and supported workflows in `README.md`.
+- [x] Document prerequisites, installation, launch, troubleshooting, and supported workflows in `README.md`.
 - [ ] Add a manual test checklist or lightweight automated tests for helper scripts and launch-path resolution.
 - [ ] Review `.gitignore` to ensure model files, runtime binaries, logs, and local configuration are not accidentally committed.
 - [ ] Add screenshots or a short demo of the GUI once the interface is stable.
