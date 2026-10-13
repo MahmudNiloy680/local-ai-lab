@@ -1,129 +1,175 @@
 # Local AI Lab — Project Status
 
-> **Status snapshot:** 12 October 2026  
-> **Purpose:** Track the current implementation, verified progress, and next milestones for the Local AI Lab project.
+> **Status snapshot:** 13 October 2026  
+> **Current milestone:** Desktop GUI and Ollama lifecycle management  
+> **Latest commit:** `b055ab8` — Improve Ollama server lifecycle management
 
 ## Overview
 
-Local AI Lab is a local-first AI workspace for running and managing language models on Ubuntu. The objective is to keep the existing Ollama runtime and model storage intact while providing a convenient desktop launcher and a simple command-line entry point.
+Local AI Lab is a local-first AI workspace for running and managing language models on Ubuntu. The project aims to make local LLM experimentation convenient while preserving the existing Ollama runtime, model storage, and configuration.
 
-The primary user workflow is intended to be:
+The primary workflow is:
 
 ```bash
 ai-lab
 ```
 
-The project is split across two directories with separate responsibilities:
+The project is organized into two separate directories:
 
-- **`local-ai-lab/`** — Git repository containing application source code, scripts, and documentation.
-- **`AI-Lab/`** — Existing runtime environment, model storage, and launch entry point.
+- **`local-ai-lab/`** — Git repository containing the application, scripts, and documentation.
+- **`AI-Lab/`** — Runtime environment, model storage, configuration, and application entry point.
 
-The current setup includes Ollama, the Qwen 2.5 Coder 7B model, and an NVIDIA RTX 3050 Laptop GPU.
+The current environment uses Ollama, Qwen 2.5 Coder 7B, and an NVIDIA RTX 3050 Laptop GPU.
 
 ## Architecture
 
 ```text
 /mnt/Experiment/
-├── local-ai-lab/                 # Git repository / source
+├── local-ai-lab/                  # Git repository
 │   ├── app/
-│   │   └── launcher.py           # Desktop GUI
+│   │   └── launcher.py            # Tkinter desktop GUI
 │   ├── scripts/
-│   │   └── chat.sh               # Chat helper script
-│   ├── scripts/check-environment.sh
-│   ├── PROJECT_STATUS.md
+│   │   ├── chat.sh                # Chat helper
+│   │   └── check-environment.sh   # Environment diagnostics
 │   ├── README.md
 │   ├── LICENSE
 │   └── .gitignore
 │
-└── AI-Lab/                       # Runtime environment
+└── AI-Lab/                        # Local runtime environment
     ├── bin/
-    │   └── ai-lab                # Single-command entry point
+    │   └── ai-lab                 # GUI entry point
     ├── runtime/
-    │   └── bin/ollama
-    └── models/                   # Model storage
+    │   └── bin/ollama             # Ollama executable
+    ├── models/                    # Model weights
+    └── config/
+        └── ollama-home/           # Ollama configuration/home
 ```
 
-*The tree is a logical overview; confirm exact filenames and paths with `find` before treating it as an exhaustive inventory.*
+This is a logical overview, not an exhaustive file inventory. Verify exact paths on the machine when changing the architecture.
 
-## Progress checklist
+## Current implementation status
 
-### Foundation and environment
+### 1. Foundation and environment
 
-- [x] Set up the existing Ollama runtime under the dedicated `AI-Lab` directory.
-- [x] Keep model storage separate from the Git source repository.
+- [x] Establish the dedicated Ollama runtime.
+- [x] Keep model storage outside the Git source repository.
 - [x] Configure Qwen 2.5 Coder 7B for local use.
-- [x] Establish the `local-ai-lab` Git repository and publish the repository to GitHub.
+- [x] Create the `local-ai-lab` Git repository and publish it to GitHub.
 - [x] Add a project license and `.gitignore`.
-- [x] Create an environment diagnostic script at `scripts/check-environment.sh`.
-- [x] Establish the `AI-Lab/bin/ai-lab` entry-point approach while keeping the GUI source in `local-ai-lab/app/launcher.py`.
+- [x] Create `scripts/check-environment.sh`.
+- [x] Establish the separate `AI-Lab/bin/ai-lab` entry point.
+- [x] Resolve the previously reported missing-entry-point path issue.
 
-### Application and launch workflow
+### 2. Desktop GUI
 
-- [x] Create `app/launcher.py` as the Python/Tkinter desktop application; the implementation was reported at approximately 540 lines.
-- [x] Update `scripts/chat.sh`.
-- [x] Configure the `ai-lab` shell alias to point to `/mnt/Experiment/AI-Lab/bin/ai-lab`.
-- [x] Resolve the previously reported missing-entry-point path issue; the user subsequently confirmed completion.
-- [x] Verify the complete workflow from a fresh terminal: run `ai-lab` and confirm that the GUI opens.
-- [x] Verify model discovery, Ollama server start/stop, and terminal chat from the GUI.
-- [x] Confirm that the configured model responds successfully after launching through the GUI.
-- [ ] Test error handling when Ollama is unavailable or the configured model is missing.
+- [x] Build the Python/Tkinter desktop launcher in `app/launcher.py`.
+- [x] Add model selection and model-list refresh.
+- [x] Add Ollama server start/stop controls.
+- [x] Add GPU telemetry and RAM tracking.
+- [x] Improve the interface with a scrollable content area.
+- [x] Improve chat terminal titles based on the selected model.
+- [x] Add a confirmation dialog when closing the GUI with an active Local AI Lab server.
+- [x] Add process detection for the existing Local AI Lab Ollama executable.
+- [x] Implement verified-process termination so a reopened GUI can manage a surviving server.
+- [x] Preserve the option to cancel closing and keep the GUI open.
 
-> Checked items above reflect work reported as completed during development. Items that depend on a fresh end-to-end run remain unchecked until explicitly verified.
+### 3. Server lifecycle management
 
-## Next steps — prioritized checklist
+- [x] Detect whether the Ollama API is responding.
+- [x] Identify the running server by its executable path and command.
+- [x] Support managing a server that remains running after the GUI has been reopened.
+- [x] Require confirmation before stopping a server through the GUI.
+- [x] Verify the target process before sending termination signals.
+- [x] Avoid broad process-killing commands such as `pkill ollama`.
+- [x] Add a timeout and forced-stop fallback to the shutdown helper.
+- [x] Commit the lifecycle-management changes as `b055ab8`.
 
-### P0 — End-to-end reliability
+**Expected close-dialog behavior**
 
-- [x] Run `ai-lab` from a fresh terminal and confirm that the GUI starts reliably.
-- [x] Confirm the GUI and scripts consistently use the intended runtime at `/mnt/Experiment/AI-Lab/runtime/bin/ollama`.
-- [x] Test server start, server stop, model listing/refresh, and chat.
-- [x] Run `git diff --check` and review `git status` before committing.
-- [ ] Capture and surface actionable errors for missing binaries, unavailable server, missing model, and failed commands.
+- **Yes:** stop the verified Local AI Lab Ollama server and close the GUI.
+- **No:** cancel the close operation and keep the GUI open.
 
+If a responding server cannot be verified against the configured runtime, the GUI should avoid stopping it automatically.
 
-### P1 — Improve the desktop experience
+### 4. Chat and model workflow
 
-- [x] Show the active server state clearly (stopped, starting, running, or error).
-- [x] Show available models and refresh the list on demand.
-- [x] Display the selected model and useful model metadata where available.
-- [x] Add a one-click action for the primary Qwen Coder chat workflow.
-- [ ] Keep long-running operations from freezing the GUI; provide progress or status feedback.
-- [ ] Ensure subprocesses are terminated cleanly and logs/errors are available for troubleshooting.
+- [x] Configure the local runtime and model directory.
+- [x] Establish the GUI-based model-launching workflow.
+- [x] Verify a complete chat session from a fresh GUI launch.
+- [x] Verify that the selected model produces a response successfully.
+- [ ] Test behavior when the configured model is missing.
+- [ ] Test behavior when the server fails to start or the port is occupied.
+
+### 5. Git and repository maintenance
+
+- [x] Track application source separately from runtime binaries and model weights.
+- [x] Commit the latest server lifecycle changes.
+- [x] Run Python syntax validation and `git diff --check` during development.
+- [x] Review and document the latest commit and feature changes in `README.md`.
+- [ ] Review the remaining untracked backup files before deciding whether to retain or remove them.
+- [ ] Push the latest commit to GitHub if it has not already been pushed.
+
+## Next milestones
+
+### P0 — Reliability and regression testing
+
+- [x] Test the complete workflow from a fresh terminal using `ai-lab`.
+- [x] Confirm model discovery and refresh.
+- [x] Test server startup, shutdown, and reopening the GUI while Ollama remains active.
+- [x] Test the close dialog with both **Yes** and **No**.
+- [x] Confirm GPU telemetry and RAM tracking continue updating.
+- [x] Confirm terminal chat launches with the selected model and returns a response.
+- [ ] Test failure cases: missing runtime, unavailable API, missing model, and occupied port.
+- [ ] Check for stale server processes after GUI shutdown.
+
+### P1 — Desktop experience
+
+- [x] Improve status messages for stopped, starting, running, and failed states.
+- [ ] Make errors actionable and provide useful log locations.
+- [ ] Prevent long-running operations from freezing the GUI.
+- [ ] Improve model metadata and resource-usage visibility.
+- [ ] Review process handling for race conditions and unexpected termination.
 
 ### P2 — Setup and portability
 
-- [ ] Add a setup/verification script for required system dependencies and executable permissions.
-- [ ] Validate paths relative to configuration where possible; document any intentionally fixed paths.
-- [ ] Add a configuration option for runtime and model directories without moving existing data.
-- [ ] Document a recovery procedure for a failed launch or stopped Ollama server.
-- [ ] Test behavior after logout/reboot and from a shell that does not inherit the current terminal session.
+- [ ] Add a setup and verification guide for system dependencies.
+- [ ] Review hard-coded paths and document the current storage layout.
+- [ ] Add configurable runtime and model-directory paths without moving existing data.
+- [ ] Document recovery steps for failed launches and interrupted server sessions.
+- [ ] Test after logout, reboot, and launch from a fresh terminal.
+- [ ] Review whether the older `runtime-new` directory is still needed or referenced.
 
-### P3 — Quality and project presentation
+### P3 — Documentation and quality
 
-- [x] Document prerequisites, installation, launch, troubleshooting, and supported workflows in `README.md`.
-- [ ] Add a manual test checklist or lightweight automated tests for helper scripts and launch-path resolution.
-- [ ] Review `.gitignore` to ensure model files, runtime binaries, logs, and local configuration are not accidentally committed.
-- [ ] Add screenshots or a short demo of the GUI once the interface is stable.
-- [ ] Keep this status checklist updated as milestones are completed.
+- [ ] Update `README.md` with the current architecture, features, and usage instructions.
+- [ ] Add a manual regression-test checklist or lightweight automated tests.
+- [ ] Verify that runtime binaries, model weights, logs, and local configuration are excluded from Git.
+- [ ] Add screenshots or a short demo after the interface stabilizes.
+- [ ] Keep this project status synchronized with future commits.
 
-## Suggested immediate execution plan
+## Immediate execution plan
 
-1. Open a fresh terminal and run `ai-lab`.
-2. In the GUI, refresh the model list and confirm Qwen 2.5 Coder 7B is available.
-3. Start Ollama, verify its running state, and test a short prompt.
-4. Stop the server and verify that the GUI reports the stopped state correctly.
-5. From the repository, run:
+1. Launch the GUI using `ai-lab`.
+2. Confirm the installed model appears in the model list.
+3. Start Ollama and verify that a chat session works.
+4. Test server stopping and GUI closing, including both close-dialog choices.
+5. Verify GPU telemetry, RAM tracking, and model refresh.
+6. Check the repository:
 
    ```bash
+   cd /mnt/Experiment/local-ai-lab
    git status --short
+   git log -3 --oneline
    git diff --check
    ```
 
-6. Fix any issues found, then update the relevant checklist items and commit the verified changes.
+7. Update the README, commit the documentation separately, and push the changes when ready.
 
 ## Scope and safety constraints
 
 - Preserve the existing Ollama runtime, model storage, scripts, and Git repository.
-- Do not download duplicate models or relocate model data as part of routine GUI improvements.
-- Do not mark a feature complete until it has been tested.
-- Keep the source repository separate from large runtime binaries and model weights.
+- Do not download duplicate models or relocate model data during routine GUI development.
+- Do not mark untested functionality as complete.
+- Verify process identity before stopping a server.
+- Keep runtime binaries and large model weights outside the source repository.
+- Make changes incrementally and validate each change before proceeding.
