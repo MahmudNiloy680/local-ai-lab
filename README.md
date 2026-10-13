@@ -1,136 +1,170 @@
 # Local AI Lab
 
-A local-first AI workspace for running language models on Ubuntu. Local AI Lab combines a lightweight desktop launcher with an isolated Ollama runtime and model storage, keeping the application source separate from large model files and runtime binaries.
+A local-first AI workspace for running and managing language models on Ubuntu. Local AI Lab combines a Python/Tkinter desktop launcher with a dedicated Ollama runtime and model storage, keeping application source code separate from runtime binaries and large model files.
 
-> **Project status:** Active development. The desktop launcher and launch-path integration are in place; complete end-to-end validation and further UI polish remain in progress.
+**Project status:** Active development. The desktop GUI, model controls, resource monitoring, and Ollama server lifecycle management are implemented. Failure-case testing, portability, and further reliability improvements remain in progress.
+
+See [`PROJECT_STATUS.md`](PROJECT_STATUS.md) for the detailed implementation checklist, verified milestones, and development roadmap.
 
 ## Overview
 
-The project is designed around a few principles:
+Local AI Lab is designed around five principles:
 
-- **Local-first:** run supported language models on your own machine.
-- **Separation of concerns:** keep source code, the Ollama runtime, and model data in separate locations.
-- **Simple launch workflow:** open the desktop application with `ai-lab`.
-- **GPU-aware:** use available NVIDIA GPU acceleration when supported by the installed Ollama runtime and model.
-- **Maintainable source:** keep runtime binaries and model weights out of Git.
+- **Local-first:** Run language models on your own machine.
+- **Separation of concerns:** Keep source code, runtime binaries, model weights, and local configuration separate.
+- **Simple workflow:** Launch the desktop application using `ai-lab`.
+- **GPU-aware:** Monitor available GPU resources and use GPU acceleration when supported by the hardware, driver, model, and Ollama runtime.
+- **Maintainability:** Keep large model files and runtime binaries out of Git.
+
+## Features
+
+- Python/Tkinter desktop launcher.
+- Model selection and model-list refresh.
+- Ollama server start and stop controls.
+- Detection of an existing Local AI Lab Ollama server.
+- Process identity verification before terminating the server.
+- Confirmation dialog when closing the GUI with an active server.
+- GPU telemetry and RAM tracking.
+- Scrollable GUI content.
+- Model-aware terminal titles for chat sessions.
+- Environment diagnostic script.
+- Separate runtime and model storage.
+
+Some failure scenarios and portability improvements still require testing. Refer to the project status document for the current checklist.
 
 ## Current environment
 
 The original development environment is:
 
-- **OS:** Ubuntu 26.04.1 LTS
-- **Laptop:** Lenovo LOQ 15IRX9
-- **GPU:** NVIDIA GeForce RTX 3050 Laptop GPU, 6 GB VRAM
-- **Runtime:** Ollama
-- **Primary model:** `qwen2.5-coder:7b`
-- **Desktop UI:** Python with Tkinter
+| Component | Configuration |
+|---|---|
+| Operating system | Ubuntu 26.04.1 LTS |
+| Laptop | Lenovo LOQ 15IRX9 |
+| GPU | NVIDIA GeForce RTX 3050 Laptop GPU, 6 GB VRAM |
+| Runtime | Ollama |
+| Primary model | `qwen2.5-coder:7b` |
+| Desktop interface | Python with Tkinter |
+| Local API | `127.0.0.1:11434` |
 
-Your hardware and installed software may differ if you reuse this project elsewhere.
+These are the development machine's specifications, not requirements for every installation.
 
 ## Architecture
 
-The setup intentionally separates the Git repository from the local runtime environment.
+The source repository and local runtime are deliberately separated.
 
 ```text
 /mnt/Experiment/
-├── local-ai-lab/                 # Git repository and source code
+├── local-ai-lab/                  # Git repository
 │   ├── app/
-│   │   └── launcher.py           # Desktop GUI
+│   │   └── launcher.py            # Desktop GUI
+│   ├── bin/
+│   │   └── chat-qwen              # Chat helper entry point
 │   ├── scripts/
-│   │   ├── chat.sh               # Chat helper
-│   │   └── check-environment.sh  # Environment diagnostics
+│   │   ├── chat.sh                # Chat helper
+│   │   └── check-environment.sh   # Environment diagnostics
 │   ├── config.example
 │   ├── .gitignore
-│   └── README.md
+│   ├── LICENSE
+│   ├── README.md
+│   └── PROJECT_STATUS.md
 │
-└── AI-Lab/                       # Local runtime environment
+└── AI-Lab/                        # Local runtime environment
     ├── bin/
-    │   └── ai-lab                # Launcher entry point
+    │   └── ai-lab                 # Desktop launcher entry point
     ├── runtime/
-    │   └── bin/ollama
-    ├── models/                   # Downloaded model data
+    │   └── bin/ollama             # Dedicated Ollama executable
+    ├── models/                    # Downloaded model data
     └── config/
-        └── ollama-home/          # Local Ollama configuration/data
+        └── ollama-home/           # Local Ollama configuration/state
 ```
 
-This is a logical overview of the intended layout; optional files and exact paths can vary by installation.
+This is a logical overview of the development setup. Exact paths and optional files may differ on other machines.
 
-### Why keep two directories?
+### Why separate the directories?
 
-- `local-ai-lab/` contains version-controlled application code and documentation.
-- `AI-Lab/` contains the runtime, model weights, and local state.
-- Large runtime/model files should not be committed to Git.
-- The launcher should call the intended runtime explicitly rather than depending on an unrelated system-wide Ollama installation.
+- `local-ai-lab/` contains version-controlled application source, scripts, and documentation.
+- `AI-Lab/` contains the runtime, downloaded models, and local configuration.
+- Large model weights and runtime binaries do not belong in the source repository.
+- The application should use its intended Ollama runtime rather than accidentally depending on an unrelated system-wide installation.
 
 ## Getting started
 
 ### 1. Prerequisites
 
-The current setup expects:
+The current application expects:
 
 - Ubuntu or a compatible Linux desktop.
-- Python 3 and Tkinter.
+- Python 3.
+- Tkinter.
 - A working Ollama runtime and at least one downloaded model.
-- A writable runtime/model location.
-- A graphical desktop session to display the Tkinter interface.
+- A writable location for runtime files, models, and configuration.
+- A graphical desktop session for the Tkinter interface.
 
-For Ubuntu, Tkinter can usually be installed with:
+On Ubuntu, Tkinter can usually be installed with:
 
 ```bash
 sudo apt install python3-tk
 ```
 
-Use the runtime and model paths configured for your own installation. The `/mnt/Experiment/AI-Lab` paths below are specific to the development machine.
+NVIDIA GPU acceleration additionally depends on compatible hardware, drivers, and runtime support. CPU execution may be possible depending on the model and available system resources.
 
-### 2. Launch the desktop application
+### 2. Launch the application
 
-The intended user-facing command is:
+On the development machine, the intended command is:
 
 ```bash
 ai-lab
 ```
 
-The shell command/alias should resolve to the launcher entry point:
+The entry point is located at:
 
 ```text
 /mnt/Experiment/AI-Lab/bin/ai-lab
 ```
 
-The GUI source lives in the repository:
+The desktop application source is:
 
 ```text
 /mnt/Experiment/local-ai-lab/app/launcher.py
 ```
 
-If the command is not found, inspect its resolution:
+If the command is not found, inspect how your shell resolves it:
 
 ```bash
 type -a ai-lab
 whence -va ai-lab
 ```
 
-The `whence` command is available in Zsh. In Bash, use `type -a ai-lab`.
+`whence` is available in Zsh. In Bash, use `type -a ai-lab`.
+
+The entry point and runtime paths above are specific to the development machine. They are not automatically configured by cloning the repository.
 
 ### 3. Check the environment
 
-From the repository:
+From the repository directory:
 
 ```bash
 cd /mnt/Experiment/local-ai-lab
 bash scripts/check-environment.sh
 ```
 
-Run the script with Bash unless its interpreter and syntax have explicitly been made compatible with another shell.
+Review the script before running it on another machine and adjust any machine-specific configuration as needed.
 
-### 4. Verify the Ollama runtime and model
+### 4. Check the Ollama runtime and models
 
-Check the installed models using the dedicated runtime:
+The dedicated runtime is located at:
+
+```text
+/mnt/Experiment/AI-Lab/runtime/bin/ollama
+```
+
+Check available models:
 
 ```bash
 /mnt/Experiment/AI-Lab/runtime/bin/ollama list
 ```
 
-This command requires the relevant Ollama server to be running. If it reports a connection error, check the configured server lifecycle and launch workflow before assuming the model is missing.
+This command requires the relevant Ollama server to be available.
 
 The primary configured model is:
 
@@ -138,18 +172,34 @@ The primary configured model is:
 qwen2.5-coder:7b
 ```
 
-## Runtime and data management
+If the command reports a connection error, first check the server's state rather than assuming that the model has been deleted.
 
-Local AI Lab is intended to use the dedicated runtime under `/mnt/Experiment/AI-Lab`, rather than requiring a permanently running system-wide Ollama service.
+## Runtime and server management
 
-The intended configuration separates:
+Local AI Lab is designed to use the dedicated Ollama runtime and avoid requiring a permanently running system-wide Ollama service.
 
-- **Runtime executable:** `/mnt/Experiment/AI-Lab/runtime/bin/ollama`
-- **Model storage:** `/mnt/Experiment/AI-Lab/models`
-- **Local Ollama state:** `/mnt/Experiment/AI-Lab/config/ollama-home`
-- **Local API endpoint:** `127.0.0.1:11434`
+The current development configuration uses:
 
-The exact environment variables and server lifecycle should be verified against the current launcher and configuration files. In particular, confirm that the server starts when needed and stops when the application exits before relying on that behavior.
+| Resource | Location |
+|---|---|
+| Runtime executable | `/mnt/Experiment/AI-Lab/runtime/bin/ollama` |
+| Model storage | `/mnt/Experiment/AI-Lab/models` |
+| Local Ollama configuration | `/mnt/Experiment/AI-Lab/config/ollama-home` |
+| Local API endpoint | `127.0.0.1:11434` |
+
+The desktop application includes server controls and process detection for its configured Ollama executable.
+
+### Shutdown behavior
+
+When the GUI is closed while a Local AI Lab server is running, the application asks whether to stop the server and close the GUI.
+
+- **Yes:** Request termination of the verified Local AI Lab server, then close the GUI if shutdown is confirmed.
+- **No:** Cancel the close operation and leave the GUI open.
+- **Unverified server:** Avoid terminating a process that cannot be verified as belonging to this Local AI Lab runtime.
+
+Stopping the server interrupts active model sessions. The GUI's process checks are intended to avoid broad process-killing commands that might affect unrelated Ollama instances.
+
+Failure scenarios and unusual process states remain part of ongoing regression testing.
 
 ## Development
 
@@ -160,61 +210,87 @@ git clone https://github.com/MahmudNiloy680/local-ai-lab.git
 cd local-ai-lab
 ```
 
-Review the example configuration and scripts before running them on another machine. The current paths may need to be adjusted for a different installation.
+Cloning the repository provides the source code and documentation. It does not automatically install the separate runtime, download model weights, or configure the development machine's `ai-lab` entry point.
+
+Review `config.example`, `.gitignore`, and the scripts before adapting the project to another environment.
 
 ### Useful checks
 
+Check the working tree:
+
 ```bash
 git status --short
+```
+
+Check for whitespace errors:
+
+```bash
 git diff --check
+```
+
+Validate the Python launcher syntax:
+
+```bash
+python3 -m py_compile app/launcher.py
+```
+
+Run the environment diagnostic script:
+
+```bash
 bash scripts/check-environment.sh
 ```
 
-Keep downloaded model weights, runtime binaries, machine-specific configuration, and generated logs out of the source repository. Check `.gitignore` before staging new files.
+These checks help identify basic repository, syntax, and environment issues. They do not replace end-to-end testing of the GUI and model workflow.
 
 ## Project checklist
 
-### Implemented or established
+### Implemented
 
-- [x] Dedicated directory for the Ollama runtime and model storage.
+- [x] Dedicated Ollama runtime and model storage.
 - [x] Qwen 2.5 Coder 7B configured as the primary model.
-- [x] Git repository and GitHub remote established.
-- [x] `.gitignore` and example configuration.
-- [x] Environment diagnostic script.
-- [x] Chat helper script.
-- [x] Python/Tkinter desktop launcher source.
-- [x] `ai-lab` entry-point approach linking the desktop workflow to the local runtime.
+- [x] Git repository, license, and `.gitignore`.
+- [x] Environment diagnostic and chat helper scripts.
+- [x] Python/Tkinter desktop launcher.
+- [x] Model selection and refresh controls.
+- [x] Server lifecycle controls and process detection.
+- [x] Verified-process termination and close confirmation.
+- [x] GPU telemetry and RAM tracking.
+- [x] Scrollable GUI content and model-aware terminal titles.
 
-### In progress / needs verification
+### Remaining work
 
-- [ ] Validate the complete `ai-lab` workflow from a fresh terminal.
-- [ ] Verify model discovery and chat from the GUI.
-- [ ] Confirm reliable server start/stop behavior.
-- [ ] Test error messages for missing binaries, unavailable server, and missing models.
-- [ ] Confirm GPU acceleration during actual inference.
-- [ ] Improve GUI status, progress feedback, and error reporting.
-- [ ] Add lightweight tests for launch-path resolution and helper scripts.
-- [ ] Finish installation, troubleshooting, and recovery documentation.
+- [ ] Test missing-runtime, missing-model, unavailable-server, and occupied-port scenarios.
+- [ ] Check for stale processes after GUI shutdown.
+- [ ] Improve error messages and logging.
+- [ ] Prevent long-running operations from freezing the GUI.
+- [ ] Review process handling for race conditions and unexpected termination.
+- [ ] Improve configuration and portability.
+- [ ] Add lightweight regression tests.
+- [ ] Complete setup and troubleshooting documentation.
+- [ ] Add screenshots or a short demonstration when the interface is stable.
 
-See [`PROJECT_STATUS.md`](PROJECT_STATUS.md) for the more detailed progress checklist and prioritized roadmap.
+For detailed progress and prioritized tasks, see [`PROJECT_STATUS.md`](PROJECT_STATUS.md).
 
 ## Roadmap
 
-1. **Reliability:** validate the launch, model selection, inference, and shutdown workflow.
-2. **Desktop experience:** improve server status, model refresh, progress reporting, and error handling.
-3. **Setup and portability:** reduce hard-coded paths where practical and document dependencies.
-4. **Quality:** add tests and reproducible verification steps.
-5. **Project presentation:** add screenshots and a short demonstration once the interface is stable.
+1. **Reliability:** Test startup, model selection, chat, shutdown, and failure recovery.
+2. **Desktop experience:** Improve responsiveness, status reporting, and error handling.
+3. **Portability:** Reduce hard-coded paths and document setup requirements.
+4. **Quality:** Add reproducible regression tests and verification steps.
+5. **Presentation:** Add screenshots and a demonstration of the working application.
 
 ## Contributing
 
-Contributions and practical bug reports are welcome. Before submitting changes:
+Practical bug reports and contributions are welcome.
+
+Before submitting changes:
 
 1. Test the affected workflow locally.
 2. Run `git diff --check`.
-3. Ensure no model weights, runtime binaries, credentials, or machine-specific secrets are included.
-4. Document any new configuration options or dependencies.
+3. Validate Python syntax when changing Python files.
+4. Keep model weights, runtime binaries, credentials, and machine-specific secrets out of Git.
+5. Document new configuration options and dependencies.
 
 ## License
 
-See the repository's [`LICENSE`](LICENSE) file.
+See the [`LICENSE`](LICENSE) file.
