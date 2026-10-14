@@ -106,6 +106,7 @@ If a responding server cannot be verified against the configured runtime, the GU
 - [x] Commit the latest server lifecycle changes.
 - [x] Run Python syntax validation and `git diff --check` during development.
 - [x] Review and document the latest commit and feature changes in `README.md`.
+- [x] Record preliminary local model benchmark results in `BENCHMARKS.md`.
 - [ ] Review the remaining untracked backup files before deciding whether to retain or remove them.
 - [ ] Push the latest commit to GitHub if it has not already been pushed.
 

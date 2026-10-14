@@ -4,7 +4,7 @@ A local-first AI workspace for running and managing language models on Ubuntu. L
 
 **Project status:** Active development. The desktop GUI, model controls, resource monitoring, and Ollama server lifecycle management are implemented. Failure-case testing, portability, and further reliability improvements remain in progress.
 
-See [`PROJECT_STATUS.md`](PROJECT_STATUS.md) for the detailed implementation checklist, verified milestones, and development roadmap.
+See [`PROJECT_STATUS.md`](PROJECT_STATUS.md) for the detailed implementation checklist, verified milestones, and development roadmap. Preliminary local model measurements are documented in [`BENCHMARKS.md`](BENCHMARKS.md).
 
 ## Overview
 
