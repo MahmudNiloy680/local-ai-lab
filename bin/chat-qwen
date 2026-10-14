@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-exec /mnt/Experiment/local-ai-lab/scripts/chat.sh "qwen2.5-coder:7b"

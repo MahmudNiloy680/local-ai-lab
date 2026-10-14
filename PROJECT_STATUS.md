@@ -24,7 +24,7 @@ The current environment uses Ollama, Qwen 2.5 Coder 7B, and an NVIDIA RTX 3050 L
 ## Architecture
 
 ```text
-/mnt/Experiment/
+/mnt/All/LLM-Exp/
 ├── local-ai-lab/                  # Git repository
 │   ├── app/
 │   │   └── launcher.py            # Tkinter desktop GUI
@@ -137,7 +137,7 @@ If a responding server cannot be verified against the configured runtime, the GU
 - [ ] Add configurable runtime and model-directory paths without moving existing data.
 - [ ] Document recovery steps for failed launches and interrupted server sessions.
 - [ ] Test after logout, reboot, and launch from a fresh terminal.
-- [ ] Review whether the older `runtime-new` directory is still needed or referenced.
+- [x] Confirmed active scripts use the migrated runtime location.
 
 ### P3 — Documentation and quality
 
@@ -157,7 +157,7 @@ If a responding server cannot be verified against the configured runtime, the GU
 6. Check the repository:
 
    ```bash
-   cd /mnt/Experiment/local-ai-lab
+   cd /mnt/All/LLM-Exp/local-ai-lab
    git status --short
    git log -3 --oneline
    git diff --check

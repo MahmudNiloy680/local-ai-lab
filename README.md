@@ -53,12 +53,10 @@ These are the development machine's specifications, not requirements for every i
 The source repository and local runtime are deliberately separated.
 
 ```text
-/mnt/Experiment/
+/mnt/All/LLM-Exp/
 ├── local-ai-lab/                  # Git repository
 │   ├── app/
 │   │   └── launcher.py            # Desktop GUI
-│   ├── bin/
-│   │   └── chat-qwen              # Chat helper entry point
 │   ├── scripts/
 │   │   ├── chat.sh                # Chat helper
 │   │   └── check-environment.sh   # Environment diagnostics
@@ -119,13 +117,13 @@ ai-lab
 The entry point is located at:
 
 ```text
-/mnt/Experiment/AI-Lab/bin/ai-lab
+/mnt/All/LLM-Exp/bin/ai-lab
 ```
 
 The desktop application source is:
 
 ```text
-/mnt/Experiment/local-ai-lab/app/launcher.py
+/mnt/All/LLM-Exp/local-ai-lab/app/launcher.py
 ```
 
 If the command is not found, inspect how your shell resolves it:
@@ -144,7 +142,7 @@ The entry point and runtime paths above are specific to the development machine.
 From the repository directory:
 
 ```bash
-cd /mnt/Experiment/local-ai-lab
+cd /mnt/All/LLM-Exp/local-ai-lab
 bash scripts/check-environment.sh
 ```
 
@@ -155,13 +153,13 @@ Review the script before running it on another machine and adjust any machine-sp
 The dedicated runtime is located at:
 
 ```text
-/mnt/Experiment/AI-Lab/runtime/bin/ollama
+/mnt/All/LLM-Exp/runtime/bin/ollama
 ```
 
 Check available models:
 
 ```bash
-/mnt/Experiment/AI-Lab/runtime/bin/ollama list
+/mnt/All/LLM-Exp/runtime/bin/ollama list
 ```
 
 This command requires the relevant Ollama server to be available.
@@ -182,9 +180,9 @@ The current development configuration uses:
 
 | Resource | Location |
 |---|---|
-| Runtime executable | `/mnt/Experiment/AI-Lab/runtime/bin/ollama` |
-| Model storage | `/mnt/Experiment/AI-Lab/models` |
-| Local Ollama configuration | `/mnt/Experiment/AI-Lab/config/ollama-home` |
+| Runtime executable | `/mnt/All/LLM-Exp/runtime/bin/ollama` |
+| Model storage | `/mnt/All/LLM-Exp/models` |
+| Local Ollama configuration | `/mnt/All/LLM-Exp/config/ollama-home` |
 | Local API endpoint | `127.0.0.1:11434` |
 
 The desktop application includes server controls and process detection for its configured Ollama executable.
