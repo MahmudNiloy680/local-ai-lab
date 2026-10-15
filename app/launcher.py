@@ -16,8 +16,8 @@ import signal
 import time
 
 
-PROJECT = Path("/mnt/Experiment/local-ai-lab")
-AI_LAB = Path("/mnt/Experiment/AI-Lab")
+PROJECT = Path("/mnt/All/LLM-Exp/local-ai-lab")
+AI_LAB = Path("/mnt/All/LLM-Exp")
 OLLAMA = AI_LAB / "runtime" / "bin" / "ollama"
 MODELS_DIR = AI_LAB / "models"
 HOST = "127.0.0.1"

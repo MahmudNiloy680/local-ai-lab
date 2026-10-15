@@ -1,7 +1,7 @@
 # Local AI Lab configuration template
 # Copy this file to config/local-ai-lab.conf and customize it.
 
-AI_LAB_BASE="$HOME/AI-Lab"
+AI_LAB_BASE="/mnt/All/LLM-Exp"
 AI_LAB_MODEL="qwen2.5-coder:7b"
 AI_LAB_HOST="127.0.0.1:11434"
 AI_LAB_RUNTIME="runtime"

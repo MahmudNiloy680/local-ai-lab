@@ -1,8 +1,7 @@
-
 #!/usr/bin/env bash
 set -u
 
-BASE="/mnt/Experiment/AI-Lab"
+BASE="/mnt/All/LLM-Exp"
 HOST="127.0.0.1:11434"
 
 section() {
@@ -30,27 +29,24 @@ for tool in bash git curl mountpoint; do
     fi
 done
 
-section "Experiment Partition"
-if mountpoint -q /mnt/Experiment; then
+section "AI Lab Storage Partition"
+if mountpoint -q /mnt/All; then
     echo "Mounted: yes"
-    df -h /mnt/Experiment
+    df -h /mnt/All
 else
     echo "Mounted: no"
-    echo "The local AI storage partition is unavailable."
+    echo "The /mnt/All storage partition is unavailable."
 fi
 
 section "Ollama Runtime"
-for binary in \
-    "$BASE/runtime/bin/ollama" \
-    "$BASE/runtime-new/bin/ollama"
-do
-    if [[ -x "$binary" ]]; then
-        echo "Found: $binary"
-        "$binary" --version 2>&1 | head -n 2
-    else
-        echo "Not executable: $binary"
-    fi
-done
+binary="$BASE/runtime/bin/ollama"
+
+if [[ -x "$binary" ]]; then
+    echo "Found: $binary"
+    "$binary" --version 2>&1 | head -n 2
+else
+    echo "Not executable: $binary"
+fi
 
 if command -v ollama >/dev/null 2>&1; then
     echo "PATH command: $(command -v ollama)"

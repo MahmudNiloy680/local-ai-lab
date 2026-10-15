@@ -18,8 +18,8 @@ HOST="${AI_LAB_HOST:-127.0.0.1:11434}"
 RUNTIME="${AI_LAB_RUNTIME:-runtime}"
 OLLAMA="$BASE/$RUNTIME/bin/ollama"
 
-if ! mountpoint -q /mnt/Experiment; then
-    echo "ERROR: /mnt/Experiment is not mounted." >&2
+if ! mountpoint -q /mnt/All; then
+    echo "ERROR: /mnt/All is not mounted." >&2
     exit 1
 fi
 
